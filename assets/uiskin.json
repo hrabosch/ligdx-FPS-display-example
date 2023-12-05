@@ -1,0 +1,12 @@
+{
+  com.badlogic.gdx.graphics.g2d.BitmapFont: {
+    default-font: { file: font.fnt }
+  },
+  com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+    default: {
+      down: default-round,
+      up: default-round,
+      font: default-font
+    },
+  }
+}
