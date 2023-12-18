@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import org.hrabosch.heroduck.actor.Enemy;
 import org.hrabosch.heroduck.actor.SimplePlayer;
 
 public class MainGameScreen implements Screen {
@@ -22,6 +24,10 @@ public class MainGameScreen implements Screen {
 
     private final ScreenManager screenManager;
     private float mouseX, mouseY;
+
+    float speed = 500f;
+
+    private Enemy enemy;
     public MainGameScreen(ScreenManager screenManager) {
         this.screenManager = screenManager;
     }
@@ -38,6 +44,8 @@ public class MainGameScreen implements Screen {
         spriteBatch = new SpriteBatch();
 
         simplePlayer = new SimplePlayer(100, 100, 30);
+        enemy = new Enemy(Gdx.graphics.getWidth() + 100, Gdx.graphics.getHeight() + 100, 5);
+        stage.addActor(enemy);
         stage.addActor(simplePlayer);
         Gdx.input.setInputProcessor(stage);
     }
@@ -48,6 +56,13 @@ public class MainGameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         handleInput();
+        handleEnemyMove();
+        handleCollision(
+                simplePlayer.getCenterX(),
+                enemy.getX(),
+                simplePlayer.getCenterY(),
+                enemy.getY()
+        );
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
@@ -68,9 +83,36 @@ public class MainGameScreen implements Screen {
         spriteBatch.end();
     }
 
-    private void handleInput() {
-        float speed = 500f;
+    private void handleCollision(double x1, double x2, double y1, double y2) {
+        // 2D: d = √[(x2 − x1)2 + (y2 − y1)2]
+        // 3D: d = √[(x2 − x1)2 + (y2 − y1)2 + (z2 − z1)2]
+        double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+        if (distance < 100) {
+            simplePlayer.setCurrentColor(Color.RED);
+        } else {
+            simplePlayer.setCurrentColor(Color.WHITE);
+        }
+    }
 
+    private void handleEnemyMove() {
+        float enemySpeed = speed/4;
+        float xDiff = simplePlayer.getCenterX() - enemy.getX();
+        float yDiff = simplePlayer.getCenterY() - enemy.getY();
+        if (xDiff < 0) {
+            enemy.moveBy(-enemySpeed * Gdx.graphics.getDeltaTime(), 0);
+        }
+        if (xDiff > 0) {
+            enemy.moveBy(enemySpeed * Gdx.graphics.getDeltaTime(), 0);
+        }
+        if (yDiff < 0) {
+            enemy.moveBy(0, -enemySpeed * Gdx.graphics.getDeltaTime());
+        }
+        if (yDiff > 0) {
+            enemy.moveBy(0, enemySpeed * Gdx.graphics.getDeltaTime());
+        }
+    }
+
+    private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             simplePlayer.moveBy(-speed * Gdx.graphics.getDeltaTime(), 0);
         }

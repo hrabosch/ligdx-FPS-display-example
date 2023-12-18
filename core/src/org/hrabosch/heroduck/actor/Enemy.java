@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class SimplePlayer extends Actor {
-    private float radius;
-    private Color currentColor = Color.BLUE;
+public class Enemy extends Actor {
 
-    public SimplePlayer(float x, float y, float radius) {
+    private float radius;
+
+    public Enemy(float x, float y, float radius) {
         this.radius = radius;
         setBounds(x - radius, y - radius, 2 * radius, 2 * radius);
     }
@@ -22,22 +22,10 @@ public class SimplePlayer extends Actor {
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        shapeRenderer.setColor(currentColor); // Red color (RGBA)
+        shapeRenderer.setColor(1, 1, 0, 1); // Red color (RGBA)
         shapeRenderer.circle(getX() + radius, getY() + radius, radius);
         shapeRenderer.end();
 
         batch.setColor(Color.WHITE);
-    }
-
-    public void setCurrentColor(Color currentColor) {
-        this.currentColor = currentColor;
-    }
-
-    public float getCenterX() {
-        return this.getX() + radius/2;
-    }
-
-    public float getCenterY() {
-        return this.getY() + radius/2;
     }
 }
