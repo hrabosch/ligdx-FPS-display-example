@@ -8,7 +8,7 @@ import org.hrabosch.heroduck.HeroDuckGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(1900,1200);
+		config.setWindowedMode(1280,800);
 		config.setForegroundFPS(60);
 		config.setTitle("HeroDuck");
 		new Lwjgl3Application(new HeroDuckGame(), config);

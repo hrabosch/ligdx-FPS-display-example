@@ -16,17 +16,14 @@ public class SimplePlayer extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.setColor(Color.WHITE);
 
         ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        shapeRenderer.setColor(currentColor); // Red color (RGBA)
+        shapeRenderer.setColor(currentColor);
         shapeRenderer.circle(getX() + radius, getY() + radius, radius);
         shapeRenderer.end();
-
-        batch.setColor(Color.WHITE);
     }
 
     public void setCurrentColor(Color currentColor) {
