@@ -20,7 +20,7 @@ public class MainGameScreen implements Screen {
     private BitmapFont font;
     private final ScreenManager screenManager;
     private float mouseX, mouseY;
-    float speed = 500f;
+    float speed = 200f;
     //private Enemy enemy;
 
     private BlobEnemy blobEnemy;
