@@ -14,6 +14,7 @@ public class ScreenManager {
         switch (screenEnum) {
             case MAIN_MENU -> gameInstance.setScreen(new MainMenuScreen(this));
             case MAIN_GAME -> gameInstance.setScreen(new MainGameScreen(this));
+            case NOT_THAT_MAIN_GAME -> gameInstance.setScreen(new SecondMainGame(this));
         }
     }
 }

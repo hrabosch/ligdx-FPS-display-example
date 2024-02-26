@@ -17,8 +17,7 @@ public class MainMenuScreen implements Screen {
     private Stage stage;
     private Skin skin;
     private ScreenManager screenManager;
-    private TextButton startBtn;
-    private TextButton exitBtn;
+    private TextButton startBtn,exitBtn, startSecBtn;
 
     public MainMenuScreen(ScreenManager screenManager) {
         this.screenManager = screenManager;
@@ -36,6 +35,16 @@ public class MainMenuScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 screenManager.showScreen(ScreenEnum.MAIN_GAME);
+            }
+        });
+
+        this.startSecBtn = new TextButton("Start #2", skin, "default");
+        startSecBtn.setWidth(300);
+        startSecBtn.setHeight(50);
+        startSecBtn.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                screenManager.showScreen(ScreenEnum.NOT_THAT_MAIN_GAME);
             }
         });
 
@@ -57,6 +66,9 @@ public class MainMenuScreen implements Screen {
 
         table.padTop(30);
         table.add(startBtn).padBottom(30);
+        table.row();
+        table.padTop(30);
+        table.add(startSecBtn).padBottom(30);
         table.row();
         table.add(exitBtn);
 
