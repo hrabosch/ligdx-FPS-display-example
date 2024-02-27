@@ -17,7 +17,7 @@ public class MainMenuScreen implements Screen {
     private Stage stage;
     private Skin skin;
     private ScreenManager screenManager;
-    private TextButton startBtn,exitBtn, startSecBtn;
+    private TextButton startBtn,exitBtn, startSecBtn, startPerlinNoiseGen;
 
     public MainMenuScreen(ScreenManager screenManager) {
         this.screenManager = screenManager;
@@ -48,6 +48,16 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        this.startPerlinNoiseGen = new TextButton("Perlin Noise Gen", skin, "default");
+        startPerlinNoiseGen.setWidth(300);
+        startPerlinNoiseGen.setHeight(50);
+        startPerlinNoiseGen.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                screenManager.showScreen(ScreenEnum.PERLIN_NOISE_GENERATION);
+            }
+        });
+
         this.exitBtn = new TextButton("Quit", skin, "default");
         exitBtn.setWidth(300);
         exitBtn.setHeight(50);
@@ -69,6 +79,9 @@ public class MainMenuScreen implements Screen {
         table.row();
         table.padTop(30);
         table.add(startSecBtn).padBottom(30);
+        table.row();
+        table.padTop(30);
+        table.add(startPerlinNoiseGen).padBottom(30);
         table.row();
         table.add(exitBtn);
 
