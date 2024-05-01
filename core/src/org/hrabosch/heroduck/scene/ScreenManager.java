@@ -1,7 +1,6 @@
 package org.hrabosch.heroduck.scene;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Screen;
 
 public class ScreenManager {
     private final Game gameInstance;
@@ -15,7 +14,7 @@ public class ScreenManager {
             case MAIN_MENU -> gameInstance.setScreen(new MainMenuScreen(this));
             case MAIN_GAME -> gameInstance.setScreen(new MainGameScreen(this));
             case NOT_THAT_MAIN_GAME -> gameInstance.setScreen(new SecondMainGame(this));
-            case PERLIN_NOISE_GENERATION -> gameInstance.setScreen(new PerlinNoiseGeneration(this));
+            case PERLIN_NOISE_GENERATION -> gameInstance.setScreen(new CustomNoiseGenerator(this));
         }
     }
 }
