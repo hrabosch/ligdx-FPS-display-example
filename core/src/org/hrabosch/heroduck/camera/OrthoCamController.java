@@ -1,4 +1,4 @@
-package org.hrabosch.heroduck;
+package org.hrabosch.heroduck.camera;
 
 import org.hrabosch.heroduck.actor.PlayerMovementStateEnum;
 
