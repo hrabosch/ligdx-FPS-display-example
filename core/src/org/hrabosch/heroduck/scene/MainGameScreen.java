@@ -8,14 +8,26 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import org.hrabosch.heroduck.actor.*;
 
 public class MainGameScreen implements Screen {
+
+    private static final int TILE_SIZE = 32;
     private Stage stage;
     private AnimatedPlayer animatedPlayer;
     private OrthographicCamera hudCamera;
@@ -26,7 +38,10 @@ public class MainGameScreen implements Screen {
     private final static Integer TIMER_SPAWN_ENEMY_INIT=10,TIMER_SPAWN_ENEMY_DELAY=20;
     float speed = 200f;
     private List<BlobEnemy> enemies = new ArrayList<>();
-    private BlobEnemy blobEnemy;
+    private TiledMap map;
+    private Texture tiles;
+    private TiledMapRenderer renderer;
+    OrthographicCamera camera;
 
 
     public MainGameScreen(ScreenManager screenManager) {
@@ -40,6 +55,47 @@ public class MainGameScreen implements Screen {
         },TIMER_SPAWN_ENEMY_INIT,TIMER_SPAWN_ENEMY_DELAY);
     }
 
+    private void generateMap(float w, float h) {
+        {
+            System.out.println(w/TILE_SIZE);
+            int widthCount = Math.round(w/TILE_SIZE);
+            int heightCount = Math.round(h/TILE_SIZE);
+            tiles = new Texture(Gdx.files.internal("source/waste_world_map.png"));
+            TextureRegion[][] splitTiles = TextureRegion.split(tiles, TILE_SIZE, TILE_SIZE);
+            map = new TiledMap();
+            MapLayers layers = map.getLayers();
+            TiledMapTileLayer layer = new TiledMapTileLayer(widthCount, heightCount, TILE_SIZE, TILE_SIZE);
+            for (int x = 0; x < widthCount; x++) {
+                for (int y = 0; y < heightCount; y++) {
+                    TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+                    if (x == 0 && y == 0) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[2][0]));
+                    } else if (x == 0 && y > 0 && y < heightCount-1) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[1][0]));
+                    } else if (x == 0 && y == heightCount - 1 ) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[0][0]));
+                    } else if (x > 0 && x < widthCount-1 && y == 0) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[2][1]));
+                    } else if (x == widthCount-1 && y == 0 ) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[2][2]));
+                    } else if (x == widthCount-1 && y > 0 && y < heightCount - 1) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[1][2]));
+                    } else if (x > 0 && x < widthCount-1 && y == heightCount-1) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
+                    } else if (x == widthCount-1 && y == heightCount-1) {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[0][2]));
+                    } else {
+                        cell.setTile(new StaticTiledMapTile(splitTiles[1][1]));
+                    }
+                    layer.setCell(x, y, cell);
+                }
+            }
+            layers.add(layer);
+        }
+
+        renderer = new OrthogonalTiledMapRenderer(map, 1);
+    }
+
     private void spawnEnemy() {
         // TODO Randomize this
         System.out.println("ENEMY GENERATED");
@@ -50,29 +106,61 @@ public class MainGameScreen implements Screen {
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
+        float w = Gdx.graphics.getWidth();
+        float h = Gdx.graphics.getHeight();
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, (w / h) * 320, 320);
+        camera.update();
+        generateMap(w, h);
+        stage = new Stage(new ScreenViewport(camera));
 
         hudCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         hudCamera.position.set(hudCamera.viewportWidth / 2.0f, hudCamera.viewportHeight / 2.0f, 1.0f);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
-
         spriteBatch = new SpriteBatch();
-
-        //simplePlayer = new SimplePlayer(100, 100, 30);
         animatedPlayer = new AnimatedPlayer(50,50);
-        //blobEnemy = new BlobEnemy(1000,1000, animatedPlayer);
-        //enemy = new Enemy(Gdx.graphics.getWidth() + 100, Gdx.graphics.getHeight() + 100, 5);
-//        stage.addActor(enemy);
-        //stage.addActor(simplePlayer);
+        animatedPlayer.addListener(new InputListener(){
+
+            @Override public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+//                if (button == Input.Buttons.LEFT) {
+                    handleMouseClickMovement(x, y);
+                //}
+                return true;
+            }
+        });
         stage.addActor(animatedPlayer);
-        //stage.addActor(blobEnemy);
         Gdx.input.setInputProcessor(stage);
-        //Gdx.input.setInputProcessor(new AnimatedPlayerInputProcessor(animatedPlayer, speed));
+    }
+
+    private void handleMouseClickMovement(float x, float y) {
+        System.out.println(x);
+        System.out.println(y);
+        boolean isLeft = (x - animatedPlayer.getCenterX()) > 0;
+        boolean isUp = (y - animatedPlayer.getCenterY()) > 0;
+        if (isLeft) {
+            animatedPlayer.setPlayerMovementState(PlayerMovementStateEnum.LEFT);
+            animatedPlayer.moveBy(-speed * Gdx.graphics.getDeltaTime(), 0);
+        }
+        if (!isLeft) {
+            animatedPlayer.setPlayerMovementState(PlayerMovementStateEnum.RIGHT);
+            animatedPlayer.moveBy(speed * Gdx.graphics.getDeltaTime(), 0);
+        }
+        if (isUp) {
+            animatedPlayer.setPlayerMovementState(PlayerMovementStateEnum.UP);
+            animatedPlayer.moveBy(0, speed * Gdx.graphics.getDeltaTime());
+        }
+        if (!isUp) {
+            animatedPlayer.setPlayerMovementState(PlayerMovementStateEnum.DOWN);
+            animatedPlayer.moveBy(0, -speed * Gdx.graphics.getDeltaTime());
+        }
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        camera.update();
+        renderer.setView(camera);
+        renderer.render();
 
         handleInput();
         enemies.forEach(this::handleEnemyMove);
