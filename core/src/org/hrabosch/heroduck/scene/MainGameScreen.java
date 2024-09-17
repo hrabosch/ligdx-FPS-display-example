@@ -42,6 +42,7 @@ public class MainGameScreen implements Screen {
 
     private void spawnEnemy() {
         // TODO Randomize this
+        System.out.println("ENEMY GENERATED");
         BlobEnemy generatedEnemy = new BlobEnemy(Gdx.graphics.getWidth()+5,Gdx.graphics.getHeight()+5, animatedPlayer);
         enemies.add(generatedEnemy);
         stage.addActor(generatedEnemy);
@@ -108,6 +109,8 @@ public class MainGameScreen implements Screen {
         // 3D: d = √[(x2 − x1)2 + (y2 − y1)2 + (z2 − z1)2]
         double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
         if (distance < 100) {
+            System.out.println("TAKING DMG");
+            animatedPlayer.takeDamage(distance);
             //simplePlayer.setCurrentColor(Color.RED);
         } else {
             //simplePlayer.setCurrentColor(Color.WHITE);
@@ -115,6 +118,7 @@ public class MainGameScreen implements Screen {
     }
 
     private void handleEnemyMove(BlobEnemy enemy) {
+        System.out.println("PRDE:");
         float enemySpeed = speed/4;
         float xDiff = animatedPlayer.getCenterX() - enemy.getCenterX();
         float yDiff = animatedPlayer.getCenterY() - enemy.getCenterY();
@@ -130,6 +134,7 @@ public class MainGameScreen implements Screen {
         if (yDiff > 0) {
             enemy.moveBy(0, enemySpeed * Gdx.graphics.getDeltaTime());
         }
+        handleCollision(animatedPlayer.getCenterX(), enemy.getCenterX(), animatedPlayer.getCenterY(), enemy.getCenterY());
     }
 
     private void handleInput() {

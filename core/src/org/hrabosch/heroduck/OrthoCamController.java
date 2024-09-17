@@ -19,10 +19,9 @@ public class OrthoCamController extends InputAdapter {
     }
 
     @Override public boolean scrolled(float amountX, float amountY) {
-        System.out.println(amountX);
-        if (amountX > 0 && camera.zoom < 5.0)
+        if ((amountX > 0 || amountY > 0) && camera.zoom < 5.0)
             camera.zoom += 0.05;
-        if (amountX < 0 && camera.zoom > 0.5)
+        if ((amountX > 0 || amountY > 0) && camera.zoom > 0.5)
             camera.zoom -= 0.05;
         return super.scrolled(amountX, amountY);
     }

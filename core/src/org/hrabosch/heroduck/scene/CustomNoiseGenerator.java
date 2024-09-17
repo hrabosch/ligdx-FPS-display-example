@@ -67,7 +67,7 @@ public class CustomNoiseGenerator implements Screen {
             screenManager.showScreen(ScreenEnum.MAIN_MENU);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            mapArray = generate2Darray(MAP_DIMENSION_X, MAP_DIMENSION_Y, 0);
+            mapArray = generate2Darray(MAP_DIMENSION_X, MAP_DIMENSION_Y, System.currentTimeMillis());
         }
     }
 
@@ -91,7 +91,7 @@ public class CustomNoiseGenerator implements Screen {
 
     }
 
-    private int[][] generate2Darray(int x, int y, int randomSeedNumber) {
+    private int[][] generate2Darray(int x, int y, long randomSeedNumber) {
         int[][] mapArray = new int[x][y];
         for (int xi = 0 ; xi < x ; xi++) {
             for (int yi = 0; yi < y; yi++) {

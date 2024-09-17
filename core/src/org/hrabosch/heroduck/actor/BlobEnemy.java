@@ -21,7 +21,11 @@ public class BlobEnemy extends Actor {
 
     AnimatedPlayer player;
 
+    private HpBar hpBar;
+    private float hp = 100;
+
     public BlobEnemy(float x, float y, AnimatedPlayer player) {
+        this.hpBar = new HpBar(hp);
         this.player = player;
         texture = new Texture(Gdx.files.internal("player/enemy.png"));
 
@@ -68,6 +72,11 @@ public class BlobEnemy extends Actor {
         super.act(deltaTime);
         animationTime += deltaTime;
         currentFrame = isLeft() ? animationLeft.getKeyFrame(animationTime, true) : animationRight.getKeyFrame(animationTime, true);
+        if (getStage() != null && hpBar.getStage() == null) {
+            getStage().addActor(hpBar);
+        }
+        hpBar.setPosition(getX(), getY() - 5);
+        hpBar.setCurrentHp(hp);
     }
 
     public float getCenterX() {

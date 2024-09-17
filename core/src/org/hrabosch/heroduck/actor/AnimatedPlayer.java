@@ -21,7 +21,11 @@ public class AnimatedPlayer extends Actor {
     TextureRegion currentFrame;
     private PlayerMovementStateEnum playerMovementState = PlayerMovementStateEnum.IDLE;
 
+    private HpBar hpBar;
+    private float hp = 100;
+
     public AnimatedPlayer(float x, float y) {
+        this.hpBar = new HpBar(hp);
         texture = new Texture(Gdx.files.internal("player/player.png"));
 
         this.deltaX = (texture.getWidth() / FRAME_COLS) / 2;
@@ -84,6 +88,11 @@ public class AnimatedPlayer extends Actor {
     public void act(float deltaTime) {
         super.act(deltaTime);
         animationTime += deltaTime;
+        if (getStage() != null && hpBar.getStage() == null) {
+            getStage().addActor(hpBar);
+        }
+        hpBar.setPosition(getX(), getY() - 5);
+        hpBar.setCurrentHp(hp);
     }
 
     public float getCenterX() {
@@ -96,5 +105,9 @@ public class AnimatedPlayer extends Actor {
 
     public void setPlayerMovementState(PlayerMovementStateEnum playerMovementState) {
         this.playerMovementState = playerMovementState;
+    }
+
+    public void takeDamage(double distance) {
+        this.hp = --hp;
     }
 }
