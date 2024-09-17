@@ -8,8 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class AnimatedPlayer extends Actor {
 
@@ -23,11 +21,11 @@ public class AnimatedPlayer extends Actor {
     TextureRegion currentFrame;
     private PlayerMovementStateEnum playerMovementState = PlayerMovementStateEnum.IDLE;
 
-    private HpBar hpBar;
+    private PlayerHpBar hpBar;
     private float hp = 100;
 
     public AnimatedPlayer(float x, float y) {
-        this.hpBar = new HpBar(hp);
+        this.hpBar = new PlayerHpBar(hp);
         texture = new Texture(Gdx.files.internal("player/player.png"));
 
         this.deltaX = (texture.getWidth() / FRAME_COLS) / 2;
@@ -61,6 +59,7 @@ public class AnimatedPlayer extends Actor {
         animationTime = 0f;
 
         setBounds(x, y, deltaX * 2, 2 * deltaY);
+        hpBar.setPosition(50,50);
     }
 
     @Override
@@ -93,7 +92,6 @@ public class AnimatedPlayer extends Actor {
         if (getStage() != null && hpBar.getStage() == null) {
             getStage().addActor(hpBar);
         }
-        hpBar.setPosition(getX(), getY() - 5);
         hpBar.setCurrentHp(hp);
     }
 
@@ -110,6 +108,8 @@ public class AnimatedPlayer extends Actor {
     }
 
     public void takeDamage(double distance) {
-        this.hp = --hp;
+        if (hp > 0) {
+            hp -=0.3;
+        }
     }
 }
