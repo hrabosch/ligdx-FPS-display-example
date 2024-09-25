@@ -57,7 +57,6 @@ public class MainGameScreen implements Screen {
 
     private void generateMap(float w, float h) {
         {
-            System.out.println(w/TILE_SIZE);
             int widthCount = Math.round(w/TILE_SIZE);
             int heightCount = Math.round(h/TILE_SIZE);
             tiles = new Texture(Gdx.files.internal("source/waste_world_map.png"));

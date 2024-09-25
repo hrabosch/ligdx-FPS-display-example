@@ -34,24 +34,32 @@ public class PlayerHpBar extends Actor  {
         batch.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        float segments = 50;
         float radius = getWidth() / 2;
         float centerX = getX() + radius;
         float centerY = getY() + radius;
 
-        for (int i = 0; i < segments; i++) {
-            float percentage = (float) i / segments;
-            float hpPercentage = currentHp / maxHp;
+        float percent = (currentHp/maxHp)*100;
 
-            Color color = new Color(1 - hpPercentage, hpPercentage, 0, 1);
-            shapeRenderer.setColor(color);
+        System.out.println(percent);
 
-            float y1 = centerY - radius + (radius * 2 * percentage);
-            float y2 = centerY - radius + (radius * 2 * (percentage + 1f / segments));
 
-            shapeRenderer.rect(centerX - radius, y1, radius * 2, y2 - y1);
+        shapeRenderer.setColor(Color.RED);
+        for (int i = 0; i <= 360 * percent; i++) {
+            float angle = (float) Math.toRadians(i);
+            shapeRenderer.triangle(
+                    centerX, centerY,
+                    centerX + radius * (float)Math.cos(angle),
+                    centerY + radius * (float)Math.sin(angle),
+                    centerX + radius * (float)Math.cos(angle + Math.toRadians(1)),
+                    centerY + radius * (float)Math.sin(angle + Math.toRadians(1))
+            );
         }
 
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.BLACK);
+        shapeRenderer.circle(centerX, centerY, radius);
         shapeRenderer.end();
 
         batch.begin();
