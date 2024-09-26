@@ -1,127 +1,112 @@
 package org.hrabosch.heroduck.scene;
 
-import org.hrabosch.heroduck.camera.OrthoCamController;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.utils.Array;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapLayers;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.ScreenUtils;
+import org.hrabosch.heroduck.elements.DirtBox;
+import org.hrabosch.heroduck.isometric.IsometricInputProcessor;
+
+import java.security.SecureRandom;
+import java.util.Random;
 
 public class SecondMainGame implements Screen {
-
     private ScreenManager screenManager;
-    private Stage stage;
-    private TiledMap map;
-    private TiledMapRenderer renderer;
+//    private PerspectiveCamera camera;
     private OrthographicCamera camera;
-    private OrthoCamController cameraController;
-    private AssetManager assetManager;
-    private Texture tiles;
-    private Texture texture;
-    private BitmapFont font;
-    private SpriteBatch batch;
+    private ModelBatch modelBatch;
+    private Environment environment;
+    private Array<ModelInstance> mapTiles;
+    private ModelBuilder modelBuilder;
 
-    private static final int MAP_DIMENSION = 50;
+    private IsometricInputProcessor inputProcessor;
 
     public SecondMainGame(ScreenManager screenManager) {
         this.screenManager = screenManager;
     }
 
-    @Override public void show() {
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
+    @Override
+    public void show() {
+        modelBatch = new ModelBatch();
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        environment.add(new DirectionalLight().set(1f, 1f, 1f, -1f, -0.8f, -0.2f));
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, (w / h) * 320, 320);
+//        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        camera.position.set(10f, 10f, 10f); // Set the camera above and to the side
+//        camera.lookAt(0f, 0f, 0f);  // Point camera to center of the map
+//        camera.near = 1f;
+//        camera.far = 300f;
+//        camera.update();
+
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        camera.setToOrtho(false, 20, 20);
+        camera.position.set(10f, 10f, 10f);
+        camera.lookAt(0f, 0f, 0f);
         camera.update();
 
-        cameraController = new OrthoCamController(camera);
-        Gdx.input.setInputProcessor(cameraController);
+        mapTiles = new Array<>();
+        modelBuilder = new ModelBuilder();
 
-        font = new BitmapFont();
-        batch = new SpriteBatch();
+//        Material whiteMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
+//        Model tileModel = modelBuilder.createBox(1f, 1f, 1f, whiteMaterial,
+//                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 
-        {
-            //tiles = new Texture(Gdx.files.internal("source/map_bg.png"));
-            tiles = new Texture(Gdx.files.internal("source/ice_berg.png"));
-            TextureRegion[][] splitTiles = TextureRegion.split(tiles, 32, 32);
-            map = new TiledMap();
-            MapLayers layers = map.getLayers();
-                TiledMapTileLayer layer = new TiledMapTileLayer(10, 10, 32, 32);
-                for (int x = 0; x < 10; x++) {
-                    for (int y = 0; y < 10; y++) {
-                        TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-                        if (x == 0 && y == 0) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[2][0]));
-                        } else if (x == 0 && y > 0 && y < 9) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[1][0]));
-                        } else if (x == 0 && y == 9 ) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[0][0]));
-                        } else if (x > 0 && x < 9 && y == 0) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[2][1]));
-                        } else if (x == 9 && y == 0 ) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[2][2]));
-                        } else if (x == 9 && y > 0 && y < 9) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[1][2]));
-                        } else if (x > 0 && x < 9 && y == 9) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
-                        } else if (x == 9 && y == 9) {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[0][2]));
-                        } else {
-                            cell.setTile(new StaticTiledMapTile(splitTiles[1][1]));
-                        }
-                        layer.setCell(x, y, cell);
-                    }
-                }
-                layers.add(layer);
+
+        Random random = new SecureRandom();
+        for (int x = 0; x < 10; x++) {
+            for (int z = 0; z < 10; z++) {
+                DirtBox box = new DirtBox();
+                ModelInstance tileInstance = new ModelInstance(box.getModel());
+                tileInstance.transform.setToTranslation(x, random.nextFloat(0f,1f), z);
+                mapTiles.add(tileInstance);
+            }
         }
 
-        renderer = new OrthogonalTiledMapRenderer(map);
-//
-//        stage = new Stage(new ScreenViewport());
-//        this.spriteBatch = new SpriteBatch();
-//        Gdx.input.setInputProcessor(stage);
+        inputProcessor = new IsometricInputProcessor(camera, mapTiles);
+        Gdx.input.setInputProcessor(inputProcessor);
     }
 
-    @Override public void render(float v) {
-        ScreenUtils.clear(100f / 255f, 100f / 255f, 250f / 255f, 1f);
+    @Override
+    public void render(float v) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        modelBatch.begin(camera);
+        for (ModelInstance tile : mapTiles) {
+            modelBatch.render(tile, environment);
+        }
+        modelBatch.end();
         camera.update();
-        renderer.setView(camera);
-        renderer.render();
-        batch.begin();
-        font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, 20);
-        batch.end();
     }
 
-    @Override public void resize(int i, int i1) {
-
+    @Override
+    public void resize(int width, int height) {
+        camera.viewportWidth = width / 32f;
+        camera.viewportHeight = height / 32f;
+        camera.update();
     }
 
-    @Override public void pause() {
-
-    }
-
-    @Override public void resume() {
+    @Override
+    public void pause() {
 
     }
 
-    @Override public void hide() {
+    @Override
+    public void resume() {
 
     }
 
-    @Override public void dispose() {
+    @Override
+    public void hide() {
 
+    }
+
+    @Override
+    public void dispose() {
+        modelBatch.dispose();
     }
 }
